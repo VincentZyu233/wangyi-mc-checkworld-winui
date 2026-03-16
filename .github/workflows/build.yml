@@ -74,8 +74,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: |
-            8.0.x
+          dotnet-version: '9.0.x'
 
       - name: Cache NuGet packages
         if: needs.check.outputs.clear_cache != 'true'
@@ -116,7 +115,7 @@ jobs:
           mkdir -p release
           
           EXE_NAME="WangyiMCCheckworld-v${VERSION}-windows-x64.exe"
-          cp "bin/Release/net8.0-windows10.0.19041.0/win-x64/publish/WangyiMCCheckworld.exe" "release/$EXE_NAME"
+          cp "bin/Release/net9.0-windows10.0.26100.0/win-x64/publish/WangyiMCCheckworld.exe" "release/$EXE_NAME"
 
       - name: Upload exe artifact
         uses: actions/upload-artifact@v4
