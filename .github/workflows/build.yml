@@ -1,0 +1,147 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    name: Check triggers
+    runs-on: ubuntu-latest
+    outputs:
+      should_build: ${{ steps.check.outputs.should_build }}
+      should_release: ${{ steps.check.outputs.should_release }}
+      clear_cache: ${{ steps.check.outputs.clear_cache }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version from csproj
+        id: version
+        run: |
+          VERSION=$(grep -oP '<Version>\K[^<]+' WangyiMCCheckworld.csproj)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Version: $VERSION"
+
+      - name: Check commit message for triggers
+        id: check
+        run: |
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          echo "Commit message: $COMMIT_MSG"
+          
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "should_build=true" >> $GITHUB_OUTPUT
+            echo "should_release=false" >> $GITHUB_OUTPUT
+            echo "clear_cache=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          if echo "$COMMIT_MSG" | grep -qi "build release"; then
+            echo "should_build=true" >> $GITHUB_OUTPUT
+            echo "should_release=true" >> $GITHUB_OUTPUT
+          elif echo "$COMMIT_MSG" | grep -qi "build action"; then
+            echo "should_build=true" >> $GITHUB_OUTPUT
+            echo "should_release=false" >> $GITHUB_OUTPUT
+          else
+            echo "should_build=false" >> $GITHUB_OUTPUT
+            echo "should_release=false" >> $GITHUB_OUTPUT
+          fi
+          
+          if echo "$COMMIT_MSG" | grep -qi "\-\-clear"; then
+            echo "clear_cache=true" >> $GITHUB_OUTPUT
+          else
+            echo "clear_cache=false" >> $GITHUB_OUTPUT
+          fi
+
+  build:
+    name: Build Windows x64
+    needs: check
+    if: needs.check.outputs.should_build == 'true'
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Cache NuGet packages
+        if: needs.check.outputs.clear_cache != 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Build
+        run: dotnet build -c Release
+
+      - name: Publish
+        run: |
+          dotnet publish -c Release -r win-x64 --self-contained true
+
+      - name: Prepare release package
+        shell: bash
+        run: |
+          VERSION="${{ needs.check.outputs.version }}"
+          mkdir -p release
+          
+          EXE_NAME="WangyiMCCheckworld-v${VERSION}-windows-x64.exe"
+          cp "bin/Release/net8.0-windows10.0.19041.0/win-x64/publish/WangyiMCCheckworld.exe" "release/$EXE_NAME"
+
+      - name: Upload exe artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WangyiMCCheckworld-v${{ needs.check.outputs.version }}-windows-x64-exe
+          path: release/*.exe
+
+  release:
+    name: Publish Release
+    needs: [check, build]
+    if: needs.check.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ needs.check.outputs.version }}
+          name: Release v${{ needs.check.outputs.version }}
+          body: |
+            ## 网易MC检查世界 v${{ needs.check.outputs.version }}
+            
+            ### 📦 下载说明
+            - **exe**: 便携版，直接运行即可
+            
+            ### ✨ 功能
+            - 📂 列出所有网易 MC 存档
+            - 🔍 搜索和排序
+            - 💾 备份存档为 ZIP
+            - ✏️ 重命名存档
+            - 🗑️ 删除存档
+            
+            ### 🖥️ 系统要求
+            - Windows 10/11 x64
+          files: |
+            artifacts/WangyiMCCheckworld-v${{ needs.check.outputs.version }}-windows-x64-exe/*.exe
+          draft: false
+          prerelease: false
