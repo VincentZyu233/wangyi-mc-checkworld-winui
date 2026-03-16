@@ -20,15 +20,9 @@
     <Product>网易MC检查世界</Product>
     <Description>网易我的世界电脑版存档管理工具</Description>
     
-    <!-- Self-contained settings for unpackaged app -->
+    <!-- Unpackaged app -->
     <WindowsPackageType>None</WindowsPackageType>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-    <SelfContained>true</SelfContained>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    
-    <!-- ReadyToRun for faster startup -->
-    <PublishReadyToRun>true</PublishReadyToRun>
-    <PublishTrimmed>false</PublishTrimmed>
     
     <!-- Enable COM for WinUI3 -->
     <EnableMsixTooling>true</EnableMsixTooling>

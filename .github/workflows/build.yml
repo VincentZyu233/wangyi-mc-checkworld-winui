@@ -106,7 +106,7 @@ jobs:
 
       - name: Publish
         run: |
-          dotnet publish -c Release -p:Platform=x64 -r win-x64 --self-contained true
+          dotnet publish -c Release -p:Platform=x64 -r win-x64 --self-contained true -p:PublishReadyToRun=true
 
       - name: Prepare release package
         shell: bash
@@ -121,10 +121,10 @@ jobs:
         run: |
           $exePath = "bin\Release\net8.0-windows10.0.19041.0\win-x64\publish\WangyiMCCheckworld.exe"
           $versionInfo = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($exePath)
-          echo "File Version: $($versionInfo.FileVersion)"
-          echo "Product Name: $($versionInfo.ProductName)"
-          echo "Product Version: $($versionInfo.ProductVersion)"
-          echo "Company Name: $($versionInfo.CompanyName)"
+          Write-Host "File Version: $($versionInfo.FileVersion)"
+          Write-Host "Product Name: $($versionInfo.ProductName)"
+          Write-Host "Product Version: $($versionInfo.ProductVersion)"
+          Write-Host "Company Name: $($versionInfo.CompanyName)"
 
       - name: Upload exe artifact
         uses: actions/upload-artifact@v4
