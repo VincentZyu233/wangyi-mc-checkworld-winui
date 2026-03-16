@@ -102,11 +102,11 @@ jobs:
         run: echo "🧹 Building without cache (--clear flag detected)"
 
       - name: Build
-        run: dotnet build -c Release
+        run: dotnet build -c Release -p:Platform=x64
 
       - name: Publish
         run: |
-          dotnet publish -c Release -r win-x64 --self-contained true
+          dotnet publish -c Release -p:Platform=x64 -r win-x64 --self-contained true
 
       - name: Prepare release package
         shell: bash
