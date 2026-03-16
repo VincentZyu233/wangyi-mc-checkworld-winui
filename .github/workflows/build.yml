@@ -117,6 +117,15 @@ jobs:
           EXE_NAME="WangyiMCCheckworld-v${VERSION}-windows-x64.exe"
           cp "bin/Release/net8.0-windows10.0.19041.0/win-x64/publish/WangyiMCCheckworld.exe" "release/$EXE_NAME"
 
+      - name: Verify exe version
+        run: |
+          $exePath = "bin\Release\net8.0-windows10.0.19041.0\win-x64\publish\WangyiMCCheckworld.exe"
+          $versionInfo = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($exePath)
+          echo "File Version: $($versionInfo.FileVersion)"
+          echo "Product Name: $($versionInfo.ProductName)"
+          echo "Product Version: $($versionInfo.ProductVersion)"
+          echo "Company Name: $($versionInfo.CompanyName)"
+
       - name: Upload exe artifact
         uses: actions/upload-artifact@v4
         with:
