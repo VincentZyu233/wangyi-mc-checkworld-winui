@@ -22,16 +22,14 @@
     
     <!-- Unpackaged app -->
     <WindowsPackageType>None</WindowsPackageType>
-    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     
-    <!-- Enable COM for WinUI3 -->
-    <EnableMsixTooling>true</EnableMsixTooling>
+    <!-- Disable MSIX tooling for unpackaged build -->
+    <EnableMsixTooling>false</EnableMsixTooling>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240802000" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
   </ItemGroup>
 
   <ItemGroup>
