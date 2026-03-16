@@ -56,6 +56,7 @@ jobs:
           
           if echo "$COMMIT_MSG" | grep -qi "\-\-clear"; then
             echo "clear_cache=true" >> $GITHUB_OUTPUT
+            echo "⚠️ Cache will be cleared for this build"
           else
             echo "clear_cache=false" >> $GITHUB_OUTPUT
           fi
@@ -73,16 +74,33 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: |
+            8.0.x
 
       - name: Cache NuGet packages
         if: needs.check.outputs.clear_cache != 'true'
         uses: actions/cache@v4
         with:
-          path: ~/.nuget/packages
+          path: |
+            ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
+
+      - name: Cache build output
+        if: needs.check.outputs.clear_cache != 'true'
+        uses: actions/cache@v4
+        with:
+          path: |
+            bin
+            obj
+          key: ${{ runner.os }}-build-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
+      - name: Clear cache notice
+        if: needs.check.outputs.clear_cache == 'true'
+        run: echo "🧹 Building without cache (--clear flag detected)"
 
       - name: Build
         run: dotnet build -c Release
@@ -121,6 +139,28 @@ jobs:
         with:
           path: artifacts
 
+      - name: List downloaded files
+        run: find artifacts -type f
+
+      - name: Delete old releases
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const releases = await github.rest.repos.listReleases({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+            for (const release of releases.data) {
+              if (release.tag_name !== 'v${{ needs.check.outputs.version }}') {
+                await github.rest.repos.deleteRelease({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  release_id: release.id
+                });
+              }
+            }
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
@@ -130,7 +170,7 @@ jobs:
             ## 网易MC检查世界 v${{ needs.check.outputs.version }}
             
             ### 📦 下载说明
-            - **exe**: 便携版，直接运行即可
+            - **exe**: 便携版，直接运行 `WangyiMCCheckworld-v${{ needs.check.outputs.version }}-windows-x64.exe` 即可
             
             ### ✨ 功能
             - 📂 列出所有网易 MC 存档
@@ -140,8 +180,24 @@ jobs:
             - 🗑️ 删除存档
             
             ### 🖥️ 系统要求
-            - Windows 10/11 x64
+            - Windows 10/11 x64 (仅支持 64 位)
+            - 已安装网易我的世界电脑版
           files: |
             artifacts/WangyiMCCheckworld-v${{ needs.check.outputs.version }}-windows-x64-exe/*.exe
           draft: false
           prerelease: false
+
+      - name: Set latest release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const release = await github.rest.repos.getLatestRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            await github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: release.data.id,
+              make_latest: "true"
+            });
