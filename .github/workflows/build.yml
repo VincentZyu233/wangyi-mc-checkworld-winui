@@ -70,7 +70,7 @@ jobs:
         run: dotnet build -c Release --no-restore /p:GITHUB_ACTIONS=true
 
       - name: Publish
-        run: dotnet publish -c Release -o publish --no-build --self-contained true -p:WindowsAppSDKSelfContained=true -p:PublishSingleFile=true
+        run: dotnet publish -c Release -r win-x64 -o publish --no-build --self-contained true -p:WindowsAppSDKSelfContained=true
 
       - name: Prepare release
         shell: bash
