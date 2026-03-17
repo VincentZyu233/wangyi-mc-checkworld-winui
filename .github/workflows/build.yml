@@ -67,10 +67,10 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        run: dotnet build -c Release --no-restore /p:GITHUB_ACTIONS=true /p:UseXamlCompilerExecutable=false /p:XamlMarkupCompilerDisabled=true
+        run: dotnet build -c Release --no-restore /p:GITHUB_ACTIONS=true
 
       - name: Publish
-        run: dotnet publish -c Release -o publish --no-build /p:UseXamlCompilerExecutable=false /p:XamlMarkupCompilerDisabled=true
+        run: dotnet publish -c Release -o publish --no-build
 
       - name: Prepare release
         shell: bash

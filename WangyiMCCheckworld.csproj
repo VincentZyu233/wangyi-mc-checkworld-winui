@@ -6,15 +6,14 @@
     <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UseWinUI>true</UseWinUI>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     
     <AssemblyName>WangyiMCCheckworld</AssemblyName>
     <RootNamespace>WangyiMCCheckworld</RootNamespace>
-    <Version>0.1.7</Version>
-    <AssemblyVersion>0.1.7.0</AssemblyVersion>
-    <FileVersion>0.1.7.0</FileVersion>
+    <Version>0.1.8</Version>
+    <AssemblyVersion>0.1.8.0</AssemblyVersion>
+    <FileVersion>0.1.8.0</FileVersion>
     <Company>VincentZyu</Company>
     <Product>网易MC检查世界</Product>
     <Description>网易我的世界电脑版存档管理工具</Description>
@@ -22,14 +21,13 @@
     <WindowsPackageType>None</WindowsPackageType>
     <EnableMsixTooling>true</EnableMsixTooling>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DisableXamlMarkupCompilerExecution>true</DisableXamlMarkupCompilerExecution>
-    <UseXamlMarkupCompiler>false</UseXamlMarkupCompiler>
-    <XamlMarkupCompilerDisabled>true</XamlMarkupCompilerDisabled>
+    <PublishTrimmed>false</PublishTrimmed>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.*" />
-    <PackageReference Include="System.Security.Permissions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.2428" />
+    <PackageReference Include="Win2D.WinUI" Version="1.0.4" />
   </ItemGroup>
 
   <ItemGroup>
