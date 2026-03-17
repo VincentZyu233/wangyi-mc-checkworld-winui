@@ -28,6 +28,24 @@ public partial class App : Application
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
         m_window = new MainWindow();
+
+        // Set window size after creation
+        if (m_window is MainWindow mainWindow)
+        {
+            // Try to set size using AppWindow if available
+            try
+            {
+                var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(mainWindow);
+                var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hwnd);
+                var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
+                appWindow?.Resize(new Windows.Graphics.SizeInt32 { Width = 1100, Height = 700 });
+            }
+            catch
+            {
+                // Ignore if AppWindow is not available
+            }
+        }
+
         m_window.Activate();
     }
 
