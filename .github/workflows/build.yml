@@ -74,8 +74,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
-          global: true
+          dotnet-version: '9.0.x'
 
       - name: Cache NuGet packages
         if: needs.check.outputs.clear_cache != 'true'
@@ -107,7 +106,7 @@ jobs:
 
       - name: Publish
         run: |
-          dotnet publish -c Release -p:Platform=x64 -r win-x64 --self-contained true -p:WindowsAppSDKSelfContained=true -p:PublishReadyToRun=true
+          dotnet publish -c Release -p:Platform=x64 -r win-x64 --self-contained true -p:PublishReadyToRun=true
 
       - name: Prepare release package
         shell: bash
@@ -116,11 +115,11 @@ jobs:
           mkdir -p release
           
           EXE_NAME="WangyiMCCheckworld-v${VERSION}-windows-x64.exe"
-          cp "bin/Release/net8.0-windows10.0.19041.0/win-x64/publish/WangyiMCCheckworld.exe" "release/$EXE_NAME"
+          cp "bin/Release/net9.0-windows10.0.26100.0/win-x64/publish/WangyiMCCheckworld.exe" "release/$EXE_NAME"
 
       - name: Verify exe version
         run: |
-          $exePath = "bin\Release\net8.0-windows10.0.19041.0\win-x64\publish\WangyiMCCheckworld.exe"
+          $exePath = "bin\Release\net9.0-windows10.0.26100.0\win-x64\publish\WangyiMCCheckworld.exe"
           $versionInfo = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($exePath)
           Write-Host "File Version: $($versionInfo.FileVersion)"
           Write-Host "Product Name: $($versionInfo.ProductName)"
