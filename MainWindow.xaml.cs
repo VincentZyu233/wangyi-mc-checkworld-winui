@@ -1,8 +1,6 @@
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
 using System.Collections.ObjectModel;
-using Windows.Storage;
+using System.IO.Compression;
 
 namespace WangyiMCCheckworld;
 
@@ -18,13 +16,12 @@ public class WorldInfo
 public partial class MainWindow : Window
 {
     private ObservableCollection<WorldInfo> _worlds = new();
-    private ObservableCollection<WorldInfo> _filteredWorlds = new();
     private string _worldsPath = string.Empty;
 
     public MainWindow()
     {
         this.InitializeComponent();
-        WorldDataGrid.ItemsSource = _filteredWorlds;
+        WorldListView.ItemsSource = _worlds;
         LoadWorldsPath();
         _ = LoadWorldsAsync();
     }
@@ -48,8 +45,6 @@ public partial class MainWindow : Window
     {
         if (string.IsNullOrEmpty(_worldsPath)) return;
 
-        LoadingRing.Visibility = Visibility.Visible;
-        LoadingRing.IsActive = true;
         StatusText.Text = "正在加载存档...";
 
         try
@@ -100,18 +95,11 @@ public partial class MainWindow : Window
                 }
             });
 
-            _filteredWorlds = new ObservableCollection<WorldInfo>(_worlds);
-            WorldDataGrid.ItemsSource = _filteredWorlds;
             StatusText.Text = $"共 {_worlds.Count} 个存档";
         }
         catch (Exception ex)
         {
             StatusText.Text = $"加载失败: {ex.Message}";
-        }
-        finally
-        {
-            LoadingRing.Visibility = Visibility.Collapsed;
-            LoadingRing.IsActive = false;
         }
     }
 
@@ -143,23 +131,6 @@ public partial class MainWindow : Window
         return $"{size:0.##} {sizes[order]}";
     }
 
-    private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        var searchText = SearchBox.Text.ToLower();
-        if (string.IsNullOrEmpty(searchText))
-        {
-            _filteredWorlds = new ObservableCollection<WorldInfo>(_worlds);
-        }
-        else
-        {
-            _filteredWorlds = new ObservableCollection<WorldInfo>(
-                _worlds.Where(w => 
-                    w.FolderName.ToLower().Contains(searchText) || 
-                    w.WorldName.ToLower().Contains(searchText)));
-        }
-        WorldDataGrid.ItemsSource = _filteredWorlds;
-    }
-
     private async void RefreshButton_Click(object sender, RoutedEventArgs e)
     {
         _worlds.Clear();
@@ -168,77 +139,18 @@ public partial class MainWindow : Window
 
     private async void BackupButton_Click(object sender, RoutedEventArgs e)
     {
-        if (WorldDataGrid.SelectedItem is WorldInfo selected)
+        if (WorldListView.SelectedItem is WorldInfo selected)
         {
             try
             {
                 StatusText.Text = "正在备份...";
                 var zipPath = Path.Combine(_worldsPath, $"{selected.FolderName}.zip");
-                await Task.Run(() => System.IO.Compression.ZipFile.CreateFromDirectory(selected.FullPath, zipPath));
+                await Task.Run(() => ZipFile.CreateFromDirectory(selected.FullPath, zipPath));
                 StatusText.Text = $"备份完成: {Path.GetFileName(zipPath)}";
             }
             catch (Exception ex)
             {
                 StatusText.Text = $"备份失败: {ex.Message}";
-            }
-        }
-    }
-
-    private void RenameButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.DataContext is WorldInfo info)
-        {
-            var dialog = new ContentDialog
-            {
-                Title = "重命名存档",
-                Content = new TextBox { Text = info.WorldName, PlaceholderText = "输入新的世界名称" },
-                PrimaryButtonText = "确定",
-                CloseButtonText = "取消"
-            };
-            dialog.PrimaryButtonClick += async (s, args) =>
-            {
-                var textBox = (TextBox)dialog.Content;
-                var newName = textBox.Text.Trim();
-                if (!string.IsNullOrEmpty(newName))
-                {
-                    var levelnamePath = Path.Combine(info.FullPath, "levelname.txt");
-                    await File.WriteAllTextAsync(levelnamePath, newName);
-                    info.WorldName = newName;
-                    await LoadWorldsAsync();
-                    StatusText.Text = "重命名成功";
-                }
-            };
-            _ = dialog.ShowAsync();
-        }
-    }
-
-    private async void DeleteButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.DataContext is WorldInfo info)
-        {
-            var dialog = new ContentDialog
-            {
-                Title = "删除确认",
-                Content = $"确定要删除存档 \"{info.WorldName}\" 吗？此操作不可恢复！",
-                PrimaryButtonText = "删除",
-                CloseButtonText = "取消",
-                PrimaryButtonStyle = new Style { TargetType = typeof(Button) }
-            };
-            
-            var result = await dialog.ShowAsync();
-            if (result == ContentDialogResult.Primary)
-            {
-                try
-                {
-                    Directory.Delete(info.FullPath, true);
-                    _worlds.Remove(info);
-                    _filteredWorlds.Remove(info);
-                    StatusText.Text = "删除成功";
-                }
-                catch (Exception ex)
-                {
-                    StatusText.Text = $"删除失败: {ex.Message}";
-                }
             }
         }
     }
