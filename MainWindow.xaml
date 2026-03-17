@@ -2,73 +2,10 @@
     x:Class="WangyiMCCheckworld.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:WangyiMCCheckworld"
-    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     Title="网易MC检查世界"
     Width="1100"
-    Height="700"
-    MinWidth="800"
-    MinHeight="500"
-    WindowStartupLocation="CenterScreen">
-    
+    Height="700">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        
-        <!-- Title Bar -->
-        <Grid Grid.Row="0" Height="48" Background="#F3F3F3">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            
-            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
-                <TextBlock Text="网易MC检查世界" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center"/>
-            </StackPanel>
-            
-            <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <Button Content="_" Width="46" Height="32" Click="MinimizeButton_Click"/>
-                <Button Content="[]" Width="46" Height="32" Click="MaximizeButton_Click"/>
-                <Button Content="X" Width="46" Height="32" Click="CloseButton_Click"/>
-            </StackPanel>
-        </Grid>
-        
-        <!-- Toolbar -->
-        <Grid Grid.Row="1" Margin="16,8">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            
-            <TextBox x:Name="SearchBox" Grid.Column="0" PlaceholderText="搜索存档..." MaxWidth="300" HorizontalAlignment="Left"/>
-            
-            <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <Button Content="刷新" Margin="0,0,8,0" Click="RefreshButton_Click"/>
-                <Button Content="备份" Click="BackupButton_Click"/>
-            </StackPanel>
-        </Grid>
-        
-        <!-- Main Content -->
-        <Grid Grid.Row="2" Margin="16,0">
-            <ListView x:Name="WorldListView">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="文件夹名" DisplayMemberBinding="{Binding FolderName}" Width="200"/>
-                        <GridViewColumn Header="世界名称" DisplayMemberBinding="{Binding WorldName}" Width="200"/>
-                        <GridViewColumn Header="最后保存" DisplayMemberBinding="{Binding LastModified}" Width="150"/>
-                        <GridViewColumn Header="大小" DisplayMemberBinding="{Binding Size}" Width="100"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
-        </Grid>
-        
-        <!-- Status Bar -->
-        <Grid Grid.Row="3" Margin="16,8">
-            <TextBlock x:Name="StatusText" Text="就绪"/>
-        </Grid>
+        <TextBlock Text="Hello World" HorizontalAlignment="Center" VerticalAlignment="Center"/>
     </Grid>
 </Window>
