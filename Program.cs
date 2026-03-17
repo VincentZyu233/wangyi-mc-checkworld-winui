@@ -2,18 +2,18 @@ using Microsoft.UI.Xaml;
 
 namespace WangyiMCCheckworld;
 
-public partial class App : Application
+public static class Program
 {
-    public App()
+    [STAThread]
+    static void Main(string[] args)
     {
-        this.InitializeComponent();
-    }
+        WinRT.ComWrappersSupport.InitializeComWrappers();
 
-    protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
-    {
-        m_window = new MainWindow();
-        m_window.Activate();
+        Microsoft.UI.Xaml.Application.Start((p) => {
+            var context = new Microsoft.UI.Dispatching.DispatcherQueueSynchronizationContext(
+                Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread());
+            SynchronizationContext.SetSynchronizationContext(context);
+            new App();
+        });
     }
-
-    private Microsoft.UI.Xaml.Window m_window;
 }
