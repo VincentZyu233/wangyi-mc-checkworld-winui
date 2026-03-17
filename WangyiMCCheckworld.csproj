@@ -11,9 +11,9 @@
     
     <AssemblyName>WangyiMCCheckworld</AssemblyName>
     <RootNamespace>WangyiMCCheckworld</RootNamespace>
-    <Version>0.1.12</Version>
-    <AssemblyVersion>0.1.12.0</AssemblyVersion>
-    <FileVersion>0.1.12.0</FileVersion>
+    <Version>0.1.13</Version>
+    <AssemblyVersion>0.1.13.0</AssemblyVersion>
+    <FileVersion>0.1.13.0</FileVersion>
     <Company>VincentZyu</Company>
     <Product>网易MC检查世界</Product>
     <Description>网易我的世界电脑版存档管理工具</Description>
@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.*" />
+    <PackageReference Include="Microsoft.Windows.SDK.Win32Metadata" Version="58.0.23" />
   </ItemGroup>
 
   <ItemGroup>
