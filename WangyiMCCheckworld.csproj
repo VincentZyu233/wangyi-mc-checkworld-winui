@@ -12,9 +12,9 @@
     
     <AssemblyName>WangyiMCCheckworld</AssemblyName>
     <RootNamespace>WangyiMCCheckworld</RootNamespace>
-    <Version>0.1.2</Version>
-    <AssemblyVersion>0.1.2.0</AssemblyVersion>
-    <FileVersion>0.1.2.0</FileVersion>
+    <Version>0.1.3</Version>
+    <AssemblyVersion>0.1.3.0</AssemblyVersion>
+    <FileVersion>0.1.3.0</FileVersion>
     <Company>VincentZyu</Company>
     <Product>网易MC检查世界</Product>
     <Description>网易我的世界电脑版存档管理工具</Description>
