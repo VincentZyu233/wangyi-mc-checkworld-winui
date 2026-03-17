@@ -102,11 +102,11 @@ jobs:
         run: echo "🧹 Building without cache (--clear flag detected)"
 
       - name: Build
-        run: dotnet build -c Release /p:GITHUB_ACTIONS=true
+        run: dotnet build -c Release /p:GITHUB_ACTIONS=true /p:UseXamlCompilerExecutable=false
 
       - name: Publish
         run: |
-          dotnet publish -c Release -r win-x64 --self-contained true /p:GITHUB_ACTIONS=true
+          dotnet publish -c Release -r win-x64 --self-contained true /p:GITHUB_ACTIONS=true /p:UseXamlCompilerExecutable=false
 
       - name: Prepare release package
         shell: bash
