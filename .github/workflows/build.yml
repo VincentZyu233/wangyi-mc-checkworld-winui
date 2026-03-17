@@ -112,6 +112,6 @@ jobs:
           tag_name: v${{ needs.check.outputs.version }}
           name: Release v${{ needs.check.outputs.version }}
           files: |
-            release/*.exe
-            release/*.zip
+            WangyiMCCheckworld-v${{ needs.check.outputs.version }}-windows-x64/release/*.exe
+            WangyiMCCheckworld-v${{ needs.check.outputs.version }}-windows-x64/release/*.zip
           draft: false
