@@ -73,17 +73,25 @@ jobs:
         run: dotnet publish -c Release -r win-x64 -o publish --no-build --self-contained true -p:WindowsAppSDKSelfContained=true
 
       - name: Prepare release
-        shell: bash
+        shell: pwsh
         run: |
-          VERSION="${{ needs.check.outputs.version }}"
-          mkdir -p release
-          cp "publish/WangyiMCCheckworld.exe" "release/WangyiMCCheckworld-v${VERSION}-windows-x64.exe"
+          $version = "${{ needs.check.outputs.version }}"
+          if (Test-Path release) { Remove-Item release -Recurse -Force }
+          New-Item -ItemType Directory -Path release | Out-Null
 
-      - name: Upload exe
+          # Copy exe (for backwards compatibility)
+          Copy-Item -Path "publish\WangyiMCCheckworld.exe" -Destination "release\WangyiMCCheckworld-v$version-windows-x64.exe"
+
+          # Create a ZIP containing the full publish output
+          $zipPath = "release\WangyiMCCheckworld-v$version-windows-x64.zip"
+          if (Test-Path $zipPath) { Remove-Item $zipPath }
+          Compress-Archive -Path "publish\*" -DestinationPath $zipPath
+
+      - name: Upload release artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: WangyiMCCheckworld-v${{ needs.check.outputs.version }}-windows-x64-exe
-          path: release/*.exe
+          name: WangyiMCCheckworld-v${{ needs.check.outputs.version }}-windows-x64
+          path: release/*
 
   release:
     name: Publish Release
