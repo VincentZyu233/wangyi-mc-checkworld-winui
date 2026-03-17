@@ -65,7 +65,7 @@ jobs:
     name: Build Windows x64
     needs: check
     if: needs.check.outputs.should_build == 'true'
-    runs-on: windows-2022
+    runs-on: windows-2019
     
     steps:
       - name: Checkout
@@ -102,11 +102,11 @@ jobs:
         run: echo "🧹 Building without cache (--clear flag detected)"
 
       - name: Build
-        run: dotnet build -c Release -p:Platform=x64
+        run: dotnet build -c Release
 
       - name: Publish
         run: |
-          dotnet publish -c Release -p:Platform=x64 -r win-x64 --self-contained true -p:PublishReadyToRun=true
+          dotnet publish -c Release -r win-x64 --self-contained true
 
       - name: Prepare release package
         shell: bash

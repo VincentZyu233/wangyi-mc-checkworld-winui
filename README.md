@@ -2,7 +2,7 @@
 
 # 网易MC检查世界
 
-WinUI3 桌面版 | Version 0.1.3
+WinUI3 桌面版 | Version 0.1.4
 
 ## 功能
 - 📂 列出所有网易 MC 存档
