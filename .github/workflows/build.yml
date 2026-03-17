@@ -63,18 +63,11 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Install Visual Studio Build Tools
-        uses: egor-tensin/vs-build-tools@v4
-        with:
-          vs-version: 2022
-
       - name: Build
-        run: |
-          msbuild WangyiMCCheckworld.csproj /p:Configuration=Release /p:Platform=x64 /p:WindowsAppSDKSelfContained=true /p:SelfContained=true
+        run: dotnet build -c Release /p:GITHUB_ACTIONS=true /p:UseXamlCompilerExecutable=false
 
       - name: Publish
-        run: |
-          msbuild WangyiMCCheckworld.csproj /p:Configuration=Release /p:Platform=x64 /p:Publish=true /p:PublishDir=publish /p:WindowsAppSDKSelfContained=true /p:SelfContained=true
+        run: dotnet publish -c Release -o publish
 
       - name: Prepare release
         shell: bash
