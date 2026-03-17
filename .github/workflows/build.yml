@@ -63,11 +63,14 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: Restore
+        run: dotnet restore
+
       - name: Build
-        run: dotnet build -c Release /p:GITHUB_ACTIONS=true /p:UseXamlCompilerExecutable=false
+        run: dotnet build -c Release --no-restore /p:GITHUB_ACTIONS=true
 
       - name: Publish
-        run: dotnet publish -c Release -o publish
+        run: dotnet publish -c Release -o publish --no-build
 
       - name: Prepare release
         shell: bash
