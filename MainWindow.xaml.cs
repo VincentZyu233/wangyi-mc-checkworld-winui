@@ -3,11 +3,10 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace WangyiMCCheckworld;
 
-public partial class MainWindow : Window
+public class MainWindow : Window
 {
     public MainWindow()
     {
-        this.InitializeComponent();
         this.Title = "网易MC检查世界";
         this.Width = 1100;
         this.Height = 700;

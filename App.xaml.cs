@@ -31,5 +31,5 @@ public partial class App : Application
         m_window.Activate();
     }
 
-    private Microsoft.UI.Xaml.Window m_window;
+    private Microsoft.UI.Xaml.Window? m_window;
 }
