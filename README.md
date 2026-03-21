@@ -1,3 +1,5 @@
+> winui c# 这个实在不会配置本地和github ci都不想配，太麻烦了，暂时先放弃了，仓库Archieved.
+
 ![wangyi-mc-checkworld-winui](https://socialify.git.ci/VincentZyu233/wangyi-mc-checkworld-winui/image?description=1&font=Source+Code+Pro&forks=1&issues=1&language=1&logo=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fe%2Fee%2FLogo-winui.svg%2F500px-Logo-winui.svg.png%3F_%3D20211009232612&name=1&owner=1&pattern=Signal&pulls=1&stargazers=1&theme=Auto)
 
 # 网易MC检查世界
