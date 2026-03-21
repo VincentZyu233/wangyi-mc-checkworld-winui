@@ -10,9 +10,9 @@
     
     <AssemblyName>WangyiMCCheckworld</AssemblyName>
     <RootNamespace>WangyiMCCheckworld</RootNamespace>
-    <Version>0.2.2</Version>
-    <AssemblyVersion>0.2.2.0</AssemblyVersion>
-    <FileVersion>0.2.2.0</FileVersion>
+    <Version>0.2.4</Version>
+    <AssemblyVersion>0.2.4.0</AssemblyVersion>
+    <FileVersion>0.2.4.0</FileVersion>
     <Company>VincentZyu</Company>
     <Product>网易MC检查世界</Product>
     <Description>网易我的世界电脑版存档管理工具</Description>
@@ -23,6 +23,11 @@
     <PublishTrimmed>false</PublishTrimmed>
     <SelfContained>true</SelfContained>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishSingleFile>false</PublishSingleFile>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <UseRidGraph>true</UseRidGraph>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 
   <ItemGroup>
