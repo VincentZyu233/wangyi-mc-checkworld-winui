@@ -11,47 +11,8 @@ permissions:
   contents: write
 
 jobs:
-  check:
-    name: Check triggers
-    runs-on: ubuntu-latest
-    outputs:
-      should_build: ${{ steps.check.outputs.should_build }}
-      should_release: ${{ steps.check.outputs.should_release }}
-      version: ${{ steps.version.outputs.version }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Get version
-        id: version
-        run: |
-          VERSION=$(grep -oP '<Version>\K[^<]+' WangyiMCCheckworld.csproj)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Check triggers
-        id: check
-        run: |
-          COMMIT_MSG="${{ github.event.head_commit.message }}"
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "should_build=true" >> $GITHUB_OUTPUT
-            echo "should_release=false" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-          if echo "$COMMIT_MSG" | grep -qi "build release"; then
-            echo "should_build=true" >> $GITHUB_OUTPUT
-            echo "should_release=true" >> $GITHUB_OUTPUT
-          elif echo "$COMMIT_MSG" | grep -qi "build action"; then
-            echo "should_build=true" >> $GITHUB_OUTPUT
-            echo "should_release=false" >> $GITHUB_OUTPUT
-          else
-            echo "should_build=false" >> $GITHUB_OUTPUT
-            echo "should_release=false" >> $GITHUB_OUTPUT
-          fi
-
   build:
     name: Build
-    needs: check
-    if: needs.check.outputs.should_build == 'true'
     runs-on: windows-latest
     
     steps:
@@ -69,13 +30,20 @@ jobs:
       - name: Build
         run: dotnet build -c Release --no-restore /p:GITHUB_ACTIONS=true
 
+      - name: Get version
+        id: version
+        run: |
+          $VERSION = Select-String -Path "WangyiMCCheckworld.csproj" -Pattern '<Version>(.*?)</Version>' | ForEach-Object { $_.Matches.Groups[1].Value }
+          echo "version=$VERSION" >> $env:GITHUB_OUTPUT
+        shell: pwsh
+
       - name: Publish
         run: dotnet publish -c Release -r win-x64 -o publish --no-build --self-contained true -p:WindowsAppSDKSelfContained=true
 
       - name: Prepare release
         shell: pwsh
         run: |
-          $version = "${{ needs.check.outputs.version }}"
+          $version = "${{ steps.version.outputs.version }}"
           if (Test-Path release) { Remove-Item release -Recurse -Force }
           New-Item -ItemType Directory -Path release | Out-Null
 
@@ -87,31 +55,49 @@ jobs:
           if (Test-Path $zipPath) { Remove-Item $zipPath }
           Compress-Archive -Path "publish\*" -DestinationPath $zipPath
 
+          # List files for debugging
+          Write-Host "Release directory contents:"  
+          Get-ChildItem -Path release -Recurse
+
       - name: Upload release artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: WangyiMCCheckworld-v${{ needs.check.outputs.version }}-windows-x64
+          name: WangyiMCCheckworld-v${{ steps.version.outputs.version }}-windows-x64
           path: release/*
 
   release:
     name: Publish Release
-    needs: [check, build]
-    if: needs.check.outputs.should_release == 'true'
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Get version
+        id: version
+        run: |
+          VERSION=$(grep -oP '<Version>\K[^<]+' WangyiMCCheckworld.csproj)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Download artifact
         uses: actions/download-artifact@v4
+        with:
+          name: WangyiMCCheckworld-v${{ steps.version.outputs.version }}-windows-x64
+
+      - name: List downloaded files
+        run: |
+          echo "Downloaded artifacts:"  
+          ls -la
+          ls -la WangyiMCCheckworld-v${{ steps.version.outputs.version }}-windows-x64/
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ needs.check.outputs.version }}
-          name: Release v${{ needs.check.outputs.version }}
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Release v${{ steps.version.outputs.version }}
           files: |
-            WangyiMCCheckworld-v${{ needs.check.outputs.version }}-windows-x64/release/*.exe
-            WangyiMCCheckworld-v${{ needs.check.outputs.version }}-windows-x64/release/*.zip
+            WangyiMCCheckworld-v${{ steps.version.outputs.version }}-windows-x64/*.exe
+            WangyiMCCheckworld-v${{ steps.version.outputs.version }}-windows-x64/*.zip
           draft: false
