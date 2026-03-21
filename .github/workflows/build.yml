@@ -38,7 +38,7 @@ jobs:
         shell: pwsh
 
       - name: Publish
-        run: dotnet publish -c Release -r win-x64 -o publish --no-build --self-contained true -p:WindowsAppSDKSelfContained=true -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:IncludeNativeLibrariesForSelfExtract=true
+        run: dotnet publish -c Release -r win-x64 -o publish --no-build --self-contained true -p:WindowsAppSDKSelfContained=true -p:PublishReadyToRun=true -p:IncludeNativeLibrariesForSelfExtract=true
 
       - name: Prepare release
         shell: pwsh
@@ -47,23 +47,24 @@ jobs:
           if (Test-Path release) { Remove-Item release -Recurse -Force }
           New-Item -ItemType Directory -Path release | Out-Null
 
-          # Copy the single exe file
-          $exePath = "publish\WangyiMCCheckworld.exe"
-          $targetExePath = "release\WangyiMCCheckworld-v$version-windows-x64.exe"
-          Copy-Item -Path $exePath -Destination $targetExePath
+          # Create a ZIP containing the full publish output
+          $zipPath = "release\WangyiMCCheckworld-v$version-windows-x64.zip"
+          if (Test-Path $zipPath) { Remove-Item $zipPath }
+          Compress-Archive -Path "publish\*" -DestinationPath $zipPath
 
           # List files for debugging
           Write-Host "Publish directory contents:"  
           Get-ChildItem -Path publish | Select-Object Name, Length, LastWriteTime | Format-Table -AutoSize
           
-          Write-Host "Release directory contents:"  
-          Get-ChildItem -Path release | Select-Object Name, Length, LastWriteTime | Format-Table -AutoSize
+          Write-Host "ZIP file size:"  
+          $zipSize = (Get-Item $zipPath).Length / 1MB
+          Write-Host "$([math]::Round($zipSize, 2)) MB"
 
       - name: Upload release artifacts
         uses: actions/upload-artifact@v4
         with:
           name: WangyiMCCheckworld-v${{ steps.version.outputs.version }}-windows-x64
-          path: release/*.exe
+          path: release/*.zip
           retention-days: 30
 
   release:
@@ -98,5 +99,5 @@ jobs:
           tag_name: v${{ steps.version.outputs.version }}
           name: Release v${{ steps.version.outputs.version }}
           files: |
-            WangyiMCCheckworld-v${{ steps.version.outputs.version }}-windows-x64.exe
+            WangyiMCCheckworld-v${{ steps.version.outputs.version }}-windows-x64.zip
           draft: false
